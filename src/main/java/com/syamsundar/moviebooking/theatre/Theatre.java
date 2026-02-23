@@ -10,7 +10,13 @@ import lombok.Setter;
 import java.util.List;
 
 @Entity
-@Table(name = "theatres")
+@Table(name = "theatres",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_theatre_name_city",
+                        columnNames = {"name", "city_id"}
+                )
+        })
 @Getter
 @Setter
 public class Theatre extends BaseEntity {
