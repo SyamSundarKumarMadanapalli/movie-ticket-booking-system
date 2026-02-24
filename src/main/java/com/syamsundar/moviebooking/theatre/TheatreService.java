@@ -2,6 +2,8 @@ package com.syamsundar.moviebooking.theatre;
 
 import com.syamsundar.moviebooking.city.City;
 import com.syamsundar.moviebooking.city.CityRepository;
+import com.syamsundar.moviebooking.common.exception.ConflictException;
+import com.syamsundar.moviebooking.common.exception.ResourceNotFoundException;
 import com.syamsundar.moviebooking.theatre.dto.CreateTheatreRequest;
 import com.syamsundar.moviebooking.theatre.dto.TheatreResponse;
 import lombok.RequiredArgsConstructor;
@@ -16,12 +18,12 @@ public class TheatreService {
 
     public TheatreResponse createTheatre(CreateTheatreRequest request){
         City city = cityRepository.findById(request.getCityId())
-                .orElseThrow(() -> new RuntimeException("City not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("City not found"));
 
         boolean exists = theatreRepository.existsByNameAndCityId(request.getName(), request.getCityId());
 
         if(exists){
-            throw new RuntimeException("This theatre already exists in this city");
+            throw new ConflictException("This theatre already exists in this city");
         }
 
         Theatre theatre = new Theatre();

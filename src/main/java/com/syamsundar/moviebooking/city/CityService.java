@@ -2,6 +2,7 @@ package com.syamsundar.moviebooking.city;
 
 import com.syamsundar.moviebooking.city.dto.CityResponse;
 import com.syamsundar.moviebooking.city.dto.CreateCityRequest;
+import com.syamsundar.moviebooking.common.exception.ConflictException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +15,7 @@ public class CityService {
     public CityResponse createCity(CreateCityRequest request){
         cityRepository.findByName(request.getName())
                 .ifPresent(city -> {
-                        throw new RuntimeException("City already exists");
+                        throw new ConflictException("City already exists");
         });
 
         City city = new City();
