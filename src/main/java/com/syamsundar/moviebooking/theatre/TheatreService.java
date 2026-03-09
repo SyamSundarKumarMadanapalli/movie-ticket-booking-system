@@ -9,6 +9,9 @@ import com.syamsundar.moviebooking.theatre.dto.TheatreResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class TheatreService {
@@ -39,5 +42,21 @@ public class TheatreService {
                 .cityId(city.getId())
                 .name(saved.getName())
                 .build();
+    }
+
+    public List<TheatreResponse> getTheatresByCity(UUID cityId){
+        City city = cityRepository.findById(cityId)
+                .orElseThrow(() -> new ResourceNotFoundException("City not found"));
+
+        List<Theatre> theatres = theatreRepository.findByCity_Id(city.getId());
+
+        return theatres.stream()
+                .map(theatre -> TheatreResponse.builder()
+                        .id(theatre.getId())
+                        .name(theatre.getName())
+                        .address(theatre.getAddress())
+                        .cityId(city.getId())
+                        .build())
+                .toList();
     }
 }
