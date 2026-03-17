@@ -18,7 +18,7 @@ public class Screen extends BaseEntity {
     @Column(nullable = false)
     private Integer totalSeats;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "theatre_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "theatre_id", nullable = false)
     private Theatre theatre;
 }
