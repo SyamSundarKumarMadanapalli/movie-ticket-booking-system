@@ -8,4 +8,6 @@ import java.util.UUID;
 public interface SeatRepository extends JpaRepository<Seat, UUID> {
 
     List<Seat> findByScreen_Id(UUID screenId);
+
+    boolean existsByScreen_Id(UUID screenId);
 }

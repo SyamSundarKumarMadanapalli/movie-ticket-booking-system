@@ -1,5 +1,6 @@
 package com.syamsundar.moviebooking.seat;
 
+import com.syamsundar.moviebooking.common.exception.ConflictException;
 import com.syamsundar.moviebooking.common.exception.ResourceNotFoundException;
 import com.syamsundar.moviebooking.screen.Screen;
 import com.syamsundar.moviebooking.screen.ScreenRepository;
@@ -17,6 +18,12 @@ public class SeatService {
     public void createSeatLayout(CreateSeatLayoutRequest request){
         Screen screen = screenRepository.findById(request.getScreenId())
                 .orElseThrow(() -> new ResourceNotFoundException("Screen not found"));
+
+        boolean alreadyExists = seatRepository.existsByScreen_Id(screen.getId());
+
+        if(alreadyExists){
+            throw new ConflictException("Seat Layout already exists for this screen");
+        }
 
         int rows = request.getNumberOfRows();
         int seatsPerRow = request.getSeatsPerRow();
