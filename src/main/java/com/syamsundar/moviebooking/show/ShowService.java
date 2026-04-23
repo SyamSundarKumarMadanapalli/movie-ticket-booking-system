@@ -1,5 +1,6 @@
 package com.syamsundar.moviebooking.show;
 
+import com.syamsundar.moviebooking.common.enums.SeatStatus;
 import com.syamsundar.moviebooking.common.exception.ConflictException;
 import com.syamsundar.moviebooking.common.exception.ResourceNotFoundException;
 import com.syamsundar.moviebooking.config.BookingProperties;
@@ -7,12 +8,17 @@ import com.syamsundar.moviebooking.movie.Movie;
 import com.syamsundar.moviebooking.movie.MovieRepository;
 import com.syamsundar.moviebooking.screen.Screen;
 import com.syamsundar.moviebooking.screen.ScreenRepository;
+import com.syamsundar.moviebooking.seat.Seat;
+import com.syamsundar.moviebooking.seat.SeatRepository;
 import com.syamsundar.moviebooking.show.dto.CreateShowRequest;
 import com.syamsundar.moviebooking.show.dto.ShowResponse;
+import com.syamsundar.moviebooking.showseat.ShowSeat;
+import com.syamsundar.moviebooking.showseat.ShowSeatRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -23,6 +29,8 @@ public class ShowService {
     private final MovieRepository movieRepository;
     private final ScreenRepository screenRepository;
     private final BookingProperties bookingProperties;
+    private final ShowSeatRepository showSeatRepository;
+    private final SeatRepository seatRepository;
 
     public ShowResponse createShow(CreateShowRequest request){
         Movie movie = movieRepository.findById(request.getMovieId())
@@ -61,14 +69,27 @@ public class ShowService {
         show.setStartTime(request.getStartTime());
         show.setEndTime(request.getEndTime());
 
-        Show saved = showRepository.save(show);
+        Show savedShow = showRepository.save(show);
+
+        List<Seat> seats = seatRepository.findByScreen_Id(screen.getId());
+        List<ShowSeat> showSeats = new ArrayList<>();
+
+        for(Seat seat : seats){
+            ShowSeat showSeat = new ShowSeat();
+            showSeat.setShow(savedShow);
+            showSeat.setSeat(seat);
+            showSeat.setStatus(SeatStatus.AVAILABLE);
+            showSeats.add(showSeat);
+        }
+
+        showSeatRepository.saveAll(showSeats);
 
         return ShowResponse.builder()
-                .id(saved.getId())
+                .id(savedShow.getId())
                 .movieId(movie.getId())
                 .screenId(screen.getId())
-                .startTime(saved.getStartTime())
-                .endTime(saved.getEndTime())
+                .startTime(savedShow.getStartTime())
+                .endTime(savedShow.getEndTime())
                 .build();
     }
 }
